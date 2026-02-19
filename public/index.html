@@ -3,77 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Jelo FitTrack</title>
+    <title>Jelo Elite AI</title>
     <style>
-        body { font-family: -apple-system, sans-serif; background: #000; color: #fff; padding: 15px; margin: 0; }
-        .card { background: #1a1a1a; padding: 15px; border-radius: 15px; margin-bottom: 12px; border: 1px solid #333; }
-        .progress-bg { background: #333; height: 10px; border-radius: 5px; margin: 10px 0; overflow: hidden; }
-        .progress-fill { background: #00ff88; height: 100%; width: 0%; transition: 0.5s; }
-        #chat-box { min-height: 50px; color: #00ff88; font-size: 14px; margin-bottom: 10px; }
-        input { width: 100%; padding: 15px; border-radius: 10px; border: 1px solid #444; background: #222; color: #fff; font-size: 16px; box-sizing: border-box; }
-        button { width: 100%; padding: 15px; background: #00ff88; border: none; border-radius: 10px; font-weight: bold; margin-top: 10px; font-size: 16px; }
-        .history-item { border-bottom: 1px solid #333; padding: 10px 0; display: flex; justify-content: space-between; font-size: 13px; }
+        :root { --neon: #00f2ff; --pink: #ff007a; --bg: #0a0a0c; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: white; padding: 20px; margin: 0; }
+        .glass { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; margin-bottom: 15px; }
+        h2 { text-transform: uppercase; letter-spacing: 2px; font-size: 14px; color: var(--neon); margin-top: 0; }
+        
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .progress-bar { height: 6px; background: #222; border-radius: 3px; margin: 10px 0; overflow: hidden; }
+        .fill { height: 100%; transition: 1s cubic-bezier(0.17, 0.67, 0.83, 0.67); }
+        
+        input { width: 100%; padding: 18px; border-radius: 15px; border: 1px solid #333; background: #16161a; color: white; font-size: 16px; box-sizing: border-box; }
+        button { width: 100%; padding: 18px; background: linear-gradient(90deg, var(--neon), #7000ff); border: none; border-radius: 15px; color: white; font-weight: 800; margin-top: 10px; box-shadow: 0 0 20px rgba(0, 242, 255, 0.3); }
+        
+        .history-card { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #222; }
+        .history-card:last-child { border: none; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <div style="font-size: 12px; color: #888;">DAILY PROTEIN</div>
-        <div id="p-text" style="font-size: 20px; font-weight: bold;">0 / 150g</div>
-        <div class="progress-bg"><div id="p-bar" class="progress-fill"></div></div>
+    <div style="text-align: center; margin-bottom: 30px;">
+        <h1 style="font-size: 24px; font-weight: 900; margin: 0;">JELO<span style="color:var(--neon)">ELITE</span></h1>
+        <div id="w-val" style="font-size: 12px; color: #555; margin-top: 5px;">CURRENT WEIGHT: -- KG</div>
     </div>
-    <div class="card" style="display: flex; justify-content: space-between;">
-        <span>WEIGHT</span> <span id="w-text" style="color: #00ff88; font-weight: bold;">-- kg</span>
+
+    <div class="stat-grid">
+        <div class="glass">
+            <h2>Protein</h2>
+            <div style="font-size: 20px; font-weight: bold;" id="p-text">0/150g</div>
+            <div class="progress-bar"><div id="p-fill" class="fill" style="background: var(--neon)"></div></div>
+        </div>
+        <div class="glass">
+            <h2>Workouts</h2>
+            <div style="font-size: 20px; font-weight: bold;" id="wk-text">0/4 week</div>
+            <div class="progress-bar"><div id="wk-fill" class="fill" style="background: var(--pink)"></div></div>
+        </div>
     </div>
-    <div id="chat-box">Ready for your input...</div>
-    <input type="text" id="userInput" placeholder="Ex: Ate 2 eggs">
-    <button onclick="send()">Update Tracker</button>
-    <div class="card" style="margin-top: 15px;">
-        <div style="font-size: 12px; color: #888; margin-bottom: 5px;">HISTORY</div>
+
+    <div class="glass" id="chat-box" style="font-size: 14px; color: #aaa; min-height: 40px; text-align: center;">Enter your meal or weight update...</div>
+    
+    <input type="text" id="userInput" placeholder="I ate 2 eggs and a banana">
+    <button onclick="send()">UPDATE ECOSYSTEM</button>
+
+    <div class="glass" style="margin-top: 20px;">
+        <h2>Recent Intelligence</h2>
         <div id="history"></div>
     </div>
 
     <script>
         async function updateUI() {
-            try {
-                const s = await (await fetch('/stats')).json();
-                document.getElementById('p-text').innerText = `${s.protein || 0} / 150g`;
-                document.getElementById('p-bar').style.width = `${((s.protein || 0)/150)*100}%`;
-                document.getElementById('w-text').innerText = `${s.weight} kg`;
-                
-                const h = await (await fetch('/history')).json();
-                document.getElementById('history').innerHTML = h.map(i => `
-                    <div class="history-item">
-                        <span>${i.item}</span>
-                        <span style="color:#00ff88">${i.protein}g P</span>
-                    </div>`).join('') || "No history yet.";
-            } catch (e) { console.error("UI Update Failed"); }
+            const s = await (await fetch('/stats')).json();
+            document.getElementById('p-text').innerText = `${s.protein} / 150g`;
+            document.getElementById('p-fill').style.width = `${(s.protein/150)*100}%`;
+            document.getElementById('wk-text').innerText = `${s.workouts} / 4 this week`;
+            document.getElementById('wk-fill').style.width = `${(s.workouts/4)*100}%`;
+            document.getElementById('w-val').innerText = `CURRENT WEIGHT: ${s.weight} KG`;
+
+            const h = await (await fetch('/history')).json();
+            document.getElementById('history').innerHTML = h.map(i => `
+                <div class="history-card">
+                    <span>${i.title}</span>
+                    <span style="color:var(--neon)">${i.subtitle}</span>
+                </div>`).join('');
         }
 
         async function send() {
+            const btn = document.querySelector('button');
             const input = document.getElementById('userInput');
-            const chat = document.getElementById('chat-box');
             if(!input.value) return;
-
-            chat.innerText = "Gemini is thinking...";
             
-            try {
-                const res = await fetch('/track', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ message: input.value })
-                });
-                const result = await res.json();
-                
-                if(result.success) {
-                    chat.innerText = result.data.recommendation || "Update logged successfully!";
-                    input.value = "";
-                    updateUI();
-                } else {
-                    chat.innerText = "AI Error: " + result.error;
-                }
-            } catch (err) {
-                chat.innerText = "Connection Error. Is the server live?";
+            btn.innerText = "ANALYZING...";
+            const res = await fetch('/track', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ message: input.value })
+            });
+            const result = await res.json();
+            
+            if(result.success) {
+                document.getElementById('chat-box').innerHTML = result.data.recommendation || "System updated successfully.";
+                input.value = "";
+                updateUI();
+            } else {
+                document.getElementById('chat-box').innerText = "ERROR: " + result.error;
             }
+            btn.innerText = "UPDATE ECOSYSTEM";
         }
         updateUI();
     </script>
