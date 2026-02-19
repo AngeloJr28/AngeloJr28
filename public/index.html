@@ -3,76 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Jelo Elite AI</title>
+    <title>JELO ELITE AI</title>
     <style>
-        :root { --neon: #00f2ff; --pink: #ff007a; --bg: #0a0a0c; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: white; padding: 20px; margin: 0; }
-        .glass { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; margin-bottom: 15px; }
-        h2 { text-transform: uppercase; letter-spacing: 2px; font-size: 14px; color: var(--neon); margin-top: 0; }
+        :root { --neon: #00f2ff; --p-color: #ff007a; --c-color: #f7ff00; --f-color: #00ff88; --bg: #050505; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: #fff; padding: 20px; margin: 0; overflow-x: hidden; }
         
-        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .progress-bar { height: 6px; background: #222; border-radius: 3px; margin: 10px 0; overflow: hidden; }
-        .fill { height: 100%; transition: 1s cubic-bezier(0.17, 0.67, 0.83, 0.67); }
+        /* Glassmorphism Cards */
+        .glass { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); border-radius: 24px; padding: 20px; margin-bottom: 15px; box-shadow: 0 8px 32px 0 rgba(0,0,0,0.8); }
         
-        input { width: 100%; padding: 18px; border-radius: 15px; border: 1px solid #333; background: #16161a; color: white; font-size: 16px; box-sizing: border-box; }
-        button { width: 100%; padding: 18px; background: linear-gradient(90deg, var(--neon), #7000ff); border: none; border-radius: 15px; color: white; font-weight: 800; margin-top: 10px; box-shadow: 0 0 20px rgba(0, 242, 255, 0.3); }
+        .header { text-align: center; margin-bottom: 25px; }
+        .header h1 { font-size: 28px; letter-spacing: 4px; font-weight: 900; margin: 0; color: #fff; text-shadow: 0 0 10px var(--neon); }
         
-        .history-card { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #222; }
-        .history-card:last-child { border: none; }
+        /* Nutrient Bar Design */
+        .macro-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .bar-bg { flex-grow: 1; height: 8px; background: #222; border-radius: 4px; margin-left: 15px; overflow: hidden; position: relative; }
+        .bar-fill { height: 100%; width: 0%; transition: width 1.2s cubic-bezier(0.1, 0.7, 1.0, 0.1); box-shadow: 0 0 10px inherit; }
+        
+        .label { font-size: 11px; font-weight: bold; width: 60px; color: #888; text-transform: uppercase; }
+        .val { font-size: 13px; font-weight: 800; width: 45px; text-align: right; }
+
+        input { width: 100%; padding: 20px; border-radius: 18px; border: 2px solid #222; background: #111; color: white; font-size: 16px; box-sizing: border-box; transition: 0.3s; }
+        input:focus { border-color: var(--neon); box-shadow: 0 0 15px rgba(0, 242, 255, 0.2); outline: none; }
+        
+        button { width: 100%; padding: 20px; background: linear-gradient(135deg, var(--neon), #7000ff); border: none; border-radius: 18px; color: white; font-weight: 900; font-size: 16px; letter-spacing: 2px; margin-top: 15px; cursor: pointer; box-shadow: 0 5px 20px rgba(0, 242, 255, 0.3); }
+        button:active { transform: scale(0.97); }
+
+        .history-card { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #1a1a1a; font-size: 13px; }
     </style>
 </head>
 <body>
-    <div style="text-align: center; margin-bottom: 30px;">
-        <h1 style="font-size: 24px; font-weight: 900; margin: 0;">JELO<span style="color:var(--neon)">ELITE</span></h1>
-        <div id="w-val" style="font-size: 12px; color: #555; margin-top: 5px;">CURRENT WEIGHT: -- KG</div>
+    <div class="header">
+        <h1>JELO<span style="color:var(--neon)">ELITE</span></h1>
+        <div id="weight" style="font-size: 10px; color: #555; margin-top: 5px;">CORE MASS: -- KG</div>
     </div>
 
-    <div class="stat-grid">
-        <div class="glass">
-            <h2>Protein</h2>
-            <div style="font-size: 20px; font-weight: bold;" id="p-text">0/150g</div>
-            <div class="progress-bar"><div id="p-fill" class="fill" style="background: var(--neon)"></div></div>
+    <div class="glass">
+        <div style="font-size: 12px; color: var(--neon); margin-bottom: 15px; font-weight: bold; letter-spacing: 1px;">DAILY NUTRIENTS</div>
+        
+        <div class="macro-row">
+            <div class="label">Protein</div>
+            <div class="bar-bg"><div id="p-bar" class="bar-fill" style="background:var(--p-color); box-shadow: 0 0 10px var(--p-color);"></div></div>
+            <div class="val" id="p-val">0g</div>
         </div>
-        <div class="glass">
-            <h2>Workouts</h2>
-            <div style="font-size: 20px; font-weight: bold;" id="wk-text">0/4 week</div>
-            <div class="progress-bar"><div id="wk-fill" class="fill" style="background: var(--pink)"></div></div>
+
+        <div class="macro-row">
+            <div class="label">Carbs</div>
+            <div class="bar-bg"><div id="c-bar" class="bar-fill" style="background:var(--c-color); box-shadow: 0 0 10px var(--c-color);"></div></div>
+            <div class="val" id="c-val">0g</div>
+        </div>
+
+        <div class="macro-row">
+            <div class="label">Fats</div>
+            <div class="bar-bg"><div id="f-bar" class="bar-fill" style="background:var(--f-color); box-shadow: 0 0 10px var(--f-color);"></div></div>
+            <div class="val" id="f-val">0g</div>
         </div>
     </div>
 
-    <div class="glass" id="chat-box" style="font-size: 14px; color: #aaa; min-height: 40px; text-align: center;">Enter your meal or weight update...</div>
-    
-    <input type="text" id="userInput" placeholder="I ate 2 eggs and a banana">
+    <div class="glass" style="display:flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 12px; font-weight: bold; color: var(--p-color);">WEEKLY WORKOUTS</span>
+        <span id="wk-val" style="font-size: 20px; font-weight: 900;">0 / 4</span>
+    </div>
+
+    <div class="glass" id="chat-box" style="font-size: 14px; text-align: center; color: #666; font-style: italic; min-height: 40px;">System Ready. Input Data...</div>
+
+    <input type="text" id="userInput" placeholder="Ate 200g chicken breast">
     <button onclick="send()">UPDATE ECOSYSTEM</button>
 
-    <div class="glass" style="margin-top: 20px;">
-        <h2>Recent Intelligence</h2>
+    <div class="glass" style="margin-top: 25px;">
+        <div style="font-size: 11px; color: #555; margin-bottom: 10px;">RECENT ACTIVITY</div>
         <div id="history"></div>
     </div>
 
     <script>
         async function updateUI() {
-            const s = await (await fetch('/stats')).json();
-            document.getElementById('p-text').innerText = `${s.protein} / 150g`;
-            document.getElementById('p-fill').style.width = `${(s.protein/150)*100}%`;
-            document.getElementById('wk-text').innerText = `${s.workouts} / 4 this week`;
-            document.getElementById('wk-fill').style.width = `${(s.workouts/4)*100}%`;
-            document.getElementById('w-val').innerText = `CURRENT WEIGHT: ${s.weight} KG`;
+            const res = await fetch('/stats');
+            const s = await res.json();
+            
+            // Goals: Protein 150g, Carbs 200g, Fats 60g
+            document.getElementById('p-val').innerText = s.p + 'g';
+            document.getElementById('p-bar').style.width = Math.min((s.p/150)*100, 100) + '%';
+            
+            document.getElementById('c-val').innerText = s.c + 'g';
+            document.getElementById('c-bar').style.width = Math.min((s.c/200)*100, 100) + '%';
+            
+            document.getElementById('f-val').innerText = s.f + 'g';
+            document.getElementById('f-bar').style.width = Math.min((s.f/60)*100, 100) + '%';
 
-            const h = await (await fetch('/history')).json();
+            document.getElementById('weight').innerText = `CORE MASS: ${s.weight} KG`;
+            document.getElementById('wk-val').innerText = `${s.workouts} / 4`;
+
+            const hRes = await fetch('/history');
+            const h = await hRes.json();
             document.getElementById('history').innerHTML = h.map(i => `
                 <div class="history-card">
-                    <span>${i.title}</span>
-                    <span style="color:var(--neon)">${i.subtitle}</span>
+                    <span style="font-weight:bold">${i.t}</span>
+                    <span style="color:var(--neon)">${i.s}</span>
                 </div>`).join('');
         }
 
         async function send() {
-            const btn = document.querySelector('button');
             const input = document.getElementById('userInput');
+            const btn = document.querySelector('button');
             if(!input.value) return;
-            
-            btn.innerText = "ANALYZING...";
+
+            btn.innerText = "PROCESSING...";
             const res = await fetch('/track', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -81,7 +115,7 @@
             const result = await res.json();
             
             if(result.success) {
-                document.getElementById('chat-box').innerHTML = result.data.recommendation || "System updated successfully.";
+                document.getElementById('chat-box').innerText = result.data.recommendation || "System Update Confirmed.";
                 input.value = "";
                 updateUI();
             } else {
