@@ -12,7 +12,6 @@ db.serialize(() => {
     db.run(`CREATE TABLE IF NOT EXISTS weight_logs (id INTEGER PRIMARY KEY AUTOINCREMENT, weight REAL, date DATETIME DEFAULT CURRENT_TIMESTAMP)`);
 });
 
-// MANUAL LOGGING ROUTE
 app.post('/manual-log', (req, res) => {
     const { type, item, cal, pro, weight } = req.body;
     if (type === 'meal') {
@@ -33,6 +32,13 @@ app.get('/stats', (req, res) => {
         db.get(`SELECT weight FROM weight_logs ORDER BY date DESC LIMIT 1`, (err, w) => {
             res.json({ calories: row?.c || 0, protein: row?.p || 0, weight: w?.weight || 0 });
         });
+    });
+});
+
+// ROUTE: Fetch today's intake history
+app.get('/daily-history', (req, res) => {
+    db.all(`SELECT item, calories, protein, time(date) as t FROM fitness_logs WHERE date(date) = date('now') ORDER BY date DESC`, (err, rows) => {
+        res.json(rows || []);
     });
 });
 
