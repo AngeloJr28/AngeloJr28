@@ -3,128 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>JELO ELITE AI</title>
+    <title>JELO ELITE MANUAL</title>
     <style>
-        :root { --neon: #00f2ff; --p-glow: #ff007a; --c-glow: #f7ff00; --f-glow: #00ff88; --bg: #08080a; }
-        body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); color: #fff; padding: 20px; margin: 0; }
-        
-        .glass { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(20px); border-radius: 25px; padding: 22px; margin-bottom: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
-        
-        .header { text-align: center; margin-bottom: 30px; }
-        .header h1 { font-size: 26px; letter-spacing: 5px; font-weight: 900; margin: 0; text-shadow: 0 0 15px var(--neon); }
-        .header div { font-size: 10px; color: #444; margin-top: 8px; font-weight: bold; }
-
-        .macro-label { font-size: 10px; font-weight: 900; text-transform: uppercase; color: #666; width: 60px; }
-        .macro-row { display: flex; align-items: center; margin-bottom: 15px; }
-        .bar-container { flex-grow: 1; height: 10px; background: #1a1a1c; border-radius: 5px; margin: 0 15px; overflow: hidden; position: relative; }
-        .bar-fill { height: 100%; width: 0%; transition: width 1.5s cubic-bezier(0.2, 0.8, 0.2, 1); border-radius: 5px; }
-        .macro-val { font-size: 14px; font-weight: 800; width: 45px; text-align: right; }
-
-        input { width: 100%; padding: 20px; border-radius: 18px; border: 1px solid #222; background: #121214; color: white; font-size: 16px; box-sizing: border-box; transition: 0.3s; }
-        input:focus { border-color: var(--neon); box-shadow: 0 0 20px rgba(0, 242, 255, 0.2); outline: none; }
-        
-        button { width: 100%; padding: 20px; background: linear-gradient(135deg, var(--neon), #8000ff); border: none; border-radius: 18px; color: white; font-weight: 900; font-size: 16px; margin-top: 15px; cursor: pointer; box-shadow: 0 8px 25px rgba(0, 242, 255, 0.2); transition: 0.3s; }
-        button:active { transform: scale(0.96); opacity: 0.9; }
-
-        .history-card { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #1a1a1c; font-size: 13px; }
+        :root { --neon: #00f2ff; --pink: #ff007a; --bg: #050505; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: white; padding: 20px; margin: 0; }
+        .glass { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 20px; margin-bottom: 15px; box-shadow: 0 8px 32px 0 rgba(0,0,0,0.8); }
+        h2 { font-size: 11px; color: var(--neon); letter-spacing: 2px; margin: 0 0 10px 0; text-transform: uppercase; }
+        .bar { height: 12px; background: #1a1a1a; border-radius: 6px; overflow: hidden; margin: 10px 0; }
+        .fill { height: 100%; width: 0%; transition: 1.2s cubic-bezier(0.1, 0.7, 1.0, 0.1); }
+        input { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #333; background: #111; color: white; margin-bottom: 10px; box-sizing: border-box; }
+        button { width: 100%; padding: 18px; background: linear-gradient(90deg, var(--neon), #7000ff); border: none; border-radius: 12px; color: white; font-weight: 900; letter-spacing: 1px; box-shadow: 0 0 15px rgba(0, 242, 255, 0.3); }
+        .workout-box { border-left: 3px solid var(--pink); padding-left: 15px; font-size: 14px; color: #ccc; line-height: 1.5; }
+        .weight-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #222; font-size: 13px; }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>JELO<span style="color:var(--neon)">ELITE</span></h1>
-        <div id="weight">CORE MASS: -- KG</div>
+    <div style="text-align: center; margin-bottom: 25px;">
+        <h1 style="font-size: 26px; font-weight: 900; margin: 0;">JELO<span style="color:var(--neon)">ELITE</span></h1>
     </div>
 
     <div class="glass">
-        <div style="font-size: 11px; color: var(--neon); font-weight: bold; margin-bottom: 20px; letter-spacing: 2px;">VITAL NUTRIENTS</div>
-        
-        <div class="macro-row">
-            <div class="macro-label">Protein</div>
-            <div class="bar-container"><div id="p-bar" class="bar-fill" style="background:var(--p-glow); box-shadow: 0 0 15px var(--p-glow);"></div></div>
-            <div class="macro-val" id="p-val">0g</div>
-        </div>
-
-        <div class="macro-row">
-            <div class="macro-label">Carbs</div>
-            <div class="bar-container"><div id="c-bar" class="bar-fill" style="background:var(--c-glow); box-shadow: 0 0 15px var(--c-glow);"></div></div>
-            <div class="macro-val" id="c-val">0g</div>
-        </div>
-
-        <div class="macro-row">
-            <div class="macro-label">Fats</div>
-            <div class="bar-container"><div id="f-bar" class="bar-fill" style="background:var(--f-glow); box-shadow: 0 0 15px var(--f-glow);"></div></div>
-            <div class="macro-val" id="f-val">0g</div>
-        </div>
+        <h2>GOAL: 80 KG (60 DAY TARGET)</h2>
+        <div id="weight-text" style="font-size: 28px; font-weight: 900; color: var(--pink);">-- KG</div>
+        <div class="bar"><div id="weight-fill" class="fill" style="background: var(--pink); box-shadow: 0 0 10px var(--pink);"></div></div>
     </div>
 
-    <div class="glass" style="display:flex; justify-content: space-between; align-items: center;">
-        <span style="font-size: 11px; font-weight: bold; color: var(--p-glow); letter-spacing: 1px;">WEEKLY ACTIVITY</span>
-        <span id="wk-val" style="font-size: 22px; font-weight: 900;">0 / 4</span>
+    <div class="glass">
+        <h2>DAILY PROTEIN (GOAL 150g)</h2>
+        <div id="p-text" style="font-size: 28px; font-weight: 900;">0g</div>
+        <div class="bar"><div id="p-fill" class="fill" style="background: var(--neon); box-shadow: 0 0 10px var(--neon);"></div></div>
     </div>
 
-    <div class="glass" id="chat-box" style="font-size: 13px; text-align: center; color: #555; font-style: italic; min-height: 40px;">System Online. Awaiting biometric data...</div>
+    <div class="glass">
+        <h2>TODAY'S MACHINE FOCUS</h2>
+        <div id="workout-desc" class="workout-box">Loading...</div>
+    </div>
 
-    <input type="text" id="userInput" placeholder="Ex: Ate 200g chicken and rice">
-    <button onclick="send()">UPDATE ECOSYSTEM</button>
+    <div class="glass">
+        <h2>LOG DATA</h2>
+        <input type="text" id="itemName" placeholder="Meal (e.g. Chicken Breast)">
+        <input type="number" id="itemVal" placeholder="Protein Grams">
+        <button onclick="logData('meal')">ADD TO MACROS</button>
+        <div style="margin: 20px 0; border-top: 1px solid #222;"></div>
+        <input type="number" id="weightVal" placeholder="Current Weight (kg)">
+        <button onclick="logData('weight')" style="background: #222; box-shadow: none;">LOG WEIGHT</button>
+    </div>
 
-    <div class="glass" style="margin-top: 30px; border-bottom: none;">
-        <div style="font-size: 10px; color: #444; margin-bottom: 10px; font-weight: bold;">RECENT INTELLIGENCE</div>
-        <div id="history"></div>
+    <div class="glass">
+        <h2>WEIGHT PROGRESS LOG</h2>
+        <div id="weight-history-list"></div>
     </div>
 
     <script>
+        const workouts = [
+            "SUN: Rest Day - Active Recovery & Stretching",
+            "MON: Chest/Triceps - Chest Press Machine, Pec Deck, Tricep Machine (4x12)",
+            "TUE: Back/Biceps - Lat Pulldowns, Seated Row Machine, Machine Curls (4x12)",
+            "WED: Legs - Leg Press, Leg Extension, Seated Leg Curl (4x12)",
+            "THU: Shoulders - Shoulder Press Machine, Lateral Raise Machine (4x12)",
+            "FRI: Full Body Machine Circuit - Chest, Back, Legs (3x15)",
+            "SAT: Rest Day - Prepare for Weekly Reset"
+        ];
+
         async function updateUI() {
-            try {
-                const res = await fetch('/stats');
-                const s = await res.json();
-                
-                document.getElementById('p-val').innerText = s.p + 'g';
-                document.getElementById('p-bar').style.width = Math.min((s.p/150)*100, 100) + '%';
-                
-                document.getElementById('c-val').innerText = s.c + 'g';
-                document.getElementById('c-bar').style.width = Math.min((s.c/200)*100, 100) + '%';
-                
-                document.getElementById('f-val').innerText = s.f + 'g';
-                document.getElementById('f-bar').style.width = Math.min((s.f/60)*100, 100) + '%';
+            const res = await fetch('/stats');
+            const s = await res.json();
+            
+            document.getElementById('p-text').innerText = `${s.protein}g`;
+            document.getElementById('p-fill').style.width = `${Math.min((s.protein/150)*100, 100)}%`;
+            
+            document.getElementById('weight-text').innerText = `${s.weight} KG`;
+            // Visualization: Closer to 80kg fills the bar
+            const weightDiff = Math.abs(s.weight - 80);
+            const weightProgress = Math.max(100 - weightDiff, 0);
+            document.getElementById('weight-fill').style.width = `${weightProgress}%`;
 
-                document.getElementById('weight').innerText = `CORE MASS: ${s.weight} KG`;
-                document.getElementById('wk-val').innerText = `${s.workouts} / 4`;
+            const day = new Date().getDay();
+            document.getElementById('workout-desc').innerText = workouts[day];
 
-                const hRes = await fetch('/history');
-                const h = await hRes.json();
-                document.getElementById('history').innerHTML = h.map(i => `
-                    <div class="history-card">
-                        <span style="font-weight:bold">${i.t}</span>
-                        <span style="color:var(--neon)">${i.s}</span>
-                    </div>`).join('');
-            } catch (e) { console.error("Update Sync Failed"); }
+            const hRes = await fetch('/weight-history');
+            const history = await hRes.json();
+            document.getElementById('weight-history-list').innerHTML = history.map(h => `
+                <div class="weight-item">
+                    <span>${new Date(h.date).toLocaleDateString()}</span>
+                    <span style="color:var(--pink); font-weight:bold;">${h.weight} kg</span>
+                </div>
+            `).join('');
         }
 
-        async function send() {
-            const input = document.getElementById('userInput');
-            const btn = document.querySelector('button');
-            if(!input.value) return;
+        async function logData(type) {
+            const item = document.getElementById('itemName').value;
+            const val = type === 'meal' ? document.getElementById('itemVal').value : document.getElementById('weightVal').value;
+            if(!val) return;
 
-            btn.innerText = "ANALYZING...";
-            try {
-                const res = await fetch('/track', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ message: input.value })
-                });
-                const result = await res.json();
-                
-                if(result.success) {
-                    document.getElementById('chat-box').innerText = result.data.recommendation || "System Updated Successfully.";
-                    input.value = "";
-                    updateUI();
-                } else {
-                    document.getElementById('chat-box').innerText = "ERROR: " + result.error;
-                }
-            } catch (err) {
-                document.getElementById('chat-box').innerText = "CONNECTION FAILURE";
-            }
-            btn.innerText = "UPDATE ECOSYSTEM";
+            await fetch('/manual-track', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ type, item, value: val })
+            });
+            updateUI();
         }
         updateUI();
     </script>
