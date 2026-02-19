@@ -6,24 +6,32 @@
     <title>JELO ELITE MANUAL</title>
     <style>
         :root { --neon: #00f2ff; --pink: #ff007a; --bg: #050505; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: white; padding: 20px; margin: 0; }
+        body { font-family: -apple-system, system-ui; background: var(--bg); color: white; padding: 20px; margin: 0; }
         .glass { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 20px; margin-bottom: 15px; box-shadow: 0 8px 32px 0 rgba(0,0,0,0.8); }
         h2 { font-size: 11px; color: var(--neon); letter-spacing: 2px; margin: 0 0 10px 0; text-transform: uppercase; }
+        
+        /* Neon Progress Bars */
         .bar { height: 12px; background: #1a1a1a; border-radius: 6px; overflow: hidden; margin: 10px 0; }
         .fill { height: 100%; width: 0%; transition: 1.2s cubic-bezier(0.1, 0.7, 1.0, 0.1); }
-        input { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #333; background: #111; color: white; margin-bottom: 10px; box-sizing: border-box; }
-        button { width: 100%; padding: 18px; background: linear-gradient(90deg, var(--neon), #7000ff); border: none; border-radius: 12px; color: white; font-weight: 900; letter-spacing: 1px; box-shadow: 0 0 15px rgba(0, 242, 255, 0.3); }
-        .workout-box { border-left: 3px solid var(--pink); padding-left: 15px; font-size: 14px; color: #ccc; line-height: 1.5; }
-        .weight-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #222; font-size: 13px; }
+        
+        /* Inputs & Controls */
+        input { width: 100%; padding: 16px; border-radius: 12px; border: 1px solid #333; background: #111; color: white; margin-bottom: 10px; box-sizing: border-box; font-size: 16px; outline: none; }
+        input:focus { border-color: var(--neon); }
+        button { width: 100%; padding: 18px; background: linear-gradient(90deg, var(--neon), #7000ff); border: none; border-radius: 12px; color: white; font-weight: 900; letter-spacing: 1px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+        button:active { transform: scale(0.97); opacity: 0.9; }
+        
+        .workout-box { border-left: 3px solid var(--pink); padding-left: 15px; font-size: 14px; color: #ccc; line-height: 1.5; font-style: italic; }
+        .history-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #222; font-size: 13px; }
     </style>
 </head>
 <body>
     <div style="text-align: center; margin-bottom: 25px;">
         <h1 style="font-size: 26px; font-weight: 900; margin: 0;">JELO<span style="color:var(--neon)">ELITE</span></h1>
+        <div style="font-size: 10px; color: #444; margin-top: 5px; font-weight: bold;">CORE ECOSYSTEM v1.0</div>
     </div>
 
     <div class="glass">
-        <h2>GOAL: 80 KG (60 DAY TARGET)</h2>
+        <h2>GOAL: 80.0 KG (TARGET)</h2>
         <div id="weight-text" style="font-size: 28px; font-weight: 900; color: var(--pink);">-- KG</div>
         <div class="bar"><div id="weight-fill" class="fill" style="background: var(--pink); box-shadow: 0 0 10px var(--pink);"></div></div>
     </div>
@@ -36,21 +44,26 @@
 
     <div class="glass">
         <h2>TODAY'S MACHINE FOCUS</h2>
-        <div id="workout-desc" class="workout-box">Loading...</div>
+        <div id="workout-desc" class="workout-box">Initializing daily routine...</div>
     </div>
 
     <div class="glass">
-        <h2>LOG DATA</h2>
-        <input type="text" id="itemName" placeholder="Meal (e.g. Chicken Breast)">
-        <input type="number" id="itemVal" placeholder="Protein Grams">
-        <button onclick="logData('meal')">ADD TO MACROS</button>
-        <div style="margin: 20px 0; border-top: 1px solid #222;"></div>
-        <input type="number" id="weightVal" placeholder="Current Weight (kg)">
-        <button onclick="logData('weight')" style="background: #222; box-shadow: none;">LOG WEIGHT</button>
+        <h2 style="color: #666;">LOG PROTEIN INTAKE</h2>
+        <div style="display: flex; gap: 10px;">
+            <input type="text" id="foodName" placeholder="Food Name" style="flex: 2;">
+            <input type="number" id="proteinAmt" placeholder="Grams" style="flex: 1;">
+        </div>
+        <button onclick="saveMeal()">ADD TO MACROS</button>
+
+        <div style="margin: 25px 0; border-top: 1px solid #222;"></div>
+
+        <h2 style="color: #666;">LOG CORE MASS</h2>
+        <input type="number" id="weightVal" placeholder="Current weight (kg)">
+        <button onclick="saveWeight()" style="background: #222; box-shadow: none;">UPDATE WEIGHT</button>
     </div>
 
     <div class="glass">
-        <h2>WEIGHT PROGRESS LOG</h2>
+        <h2>WEIGHT PROGRESS HISTORY</h2>
         <div id="weight-history-list"></div>
     </div>
 
@@ -66,43 +79,69 @@
         ];
 
         async function updateUI() {
-            const res = await fetch('/stats');
-            const s = await res.json();
-            
-            document.getElementById('p-text').innerText = `${s.protein}g`;
-            document.getElementById('p-fill').style.width = `${Math.min((s.protein/150)*100, 100)}%`;
-            
-            document.getElementById('weight-text').innerText = `${s.weight} KG`;
-            // Visualization: Closer to 80kg fills the bar
-            const weightDiff = Math.abs(s.weight - 80);
-            const weightProgress = Math.max(100 - weightDiff, 0);
-            document.getElementById('weight-fill').style.width = `${weightProgress}%`;
+            try {
+                const res = await fetch('/stats');
+                const s = await res.json();
+                
+                // Protein Progress
+                const protein = s.protein || 0;
+                document.getElementById('p-text').innerText = `${protein}g`;
+                document.getElementById('p-fill').style.width = `${Math.min((protein/150)*100, 100)}%`;
+                
+                // Weight Progress toward 80kg
+                const weight = s.weight || 0;
+                document.getElementById('weight-text').innerText = `${weight} KG`;
+                if (weight > 0) {
+                    const diff = Math.abs(weight - 80);
+                    const progress = Math.max(100 - diff, 0);
+                    document.getElementById('weight-fill').style.width = `${progress}%`;
+                }
 
-            const day = new Date().getDay();
-            document.getElementById('workout-desc').innerText = workouts[day];
+                // Daily Routine
+                const day = new Date().getDay();
+                document.getElementById('workout-desc').innerText = workouts[day];
 
-            const hRes = await fetch('/weight-history');
-            const history = await hRes.json();
-            document.getElementById('weight-history-list').innerHTML = history.map(h => `
-                <div class="weight-item">
-                    <span>${new Date(h.date).toLocaleDateString()}</span>
-                    <span style="color:var(--pink); font-weight:bold;">${h.weight} kg</span>
-                </div>
-            `).join('');
+                // History List
+                const hRes = await fetch('/weight-history');
+                const history = await hRes.json();
+                document.getElementById('weight-history-list').innerHTML = history.map(h => `
+                    <div class="history-item">
+                        <span>${new Date(h.date).toLocaleDateString()}</span>
+                        <span style="color:var(--pink); font-weight:bold;">${h.weight} kg</span>
+                    </div>
+                `).join('') || "No weight logs found.";
+            } catch (e) { console.error("UI Update Sync Failed"); }
         }
 
-        async function logData(type) {
-            const item = document.getElementById('itemName').value;
-            const val = type === 'meal' ? document.getElementById('itemVal').value : document.getElementById('weightVal').value;
-            if(!val) return;
+        async function saveMeal() {
+            const item = document.getElementById('foodName').value;
+            const value = document.getElementById('proteinAmt').value;
+            if (!value) return;
 
             await fetch('/manual-track', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ type, item, value: val })
+                body: JSON.stringify({ type: 'meal', item, value: parseFloat(value) })
             });
+            document.getElementById('foodName').value = '';
+            document.getElementById('proteinAmt').value = '';
             updateUI();
         }
+
+        async function saveWeight() {
+            const value = document.getElementById('weightVal').value;
+            if (!value) return;
+
+            await fetch('/manual-track', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ type: 'weight', value: parseFloat(value) })
+            });
+            document.getElementById('weightVal').value = '';
+            updateUI();
+        }
+
+        // Auto-load on startup
         updateUI();
     </script>
 </body>
