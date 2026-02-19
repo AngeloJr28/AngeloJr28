@@ -1,3 +1,69 @@
-node_modules
-.env
-fitness.db
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Jelo FitTrack</title>
+    <style>
+        body { font-family: -apple-system, sans-serif; background: #000; color: #fff; padding: 15px; margin: 0; }
+        .card { background: #1a1a1a; padding: 15px; border-radius: 15px; margin-bottom: 12px; border: 1px solid #333; }
+        .progress-bg { background: #333; height: 10px; border-radius: 5px; margin: 10px 0; overflow: hidden; }
+        .progress-fill { background: #00ff88; height: 100%; width: 0%; transition: 0.5s; }
+        #chat-box { min-height: 60px; color: #00ff88; font-size: 14px; margin-bottom: 10px; }
+        input { width: 100%; padding: 15px; border-radius: 10px; border: 1px solid #444; background: #222; color: #fff; font-size: 16px; box-sizing: border-box; }
+        button { width: 100%; padding: 15px; background: #00ff88; border: none; border-radius: 10px; font-weight: bold; margin-top: 10px; font-size: 16px; }
+        .history-item { border-bottom: 1px solid #333; padding: 10px 0; display: flex; justify-content: space-between; font-size: 13px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div style="font-size: 12px; color: #888;">DAILY PROTEIN</div>
+        <div id="p-text" style="font-size: 20px; font-weight: bold;">0 / 150g</div>
+        <div class="progress-bg"><div id="p-bar" class="progress-fill"></div></div>
+    </div>
+    <div class="card" style="display: flex; justify-content: space-between;">
+        <span>WEIGHT</span> <span id="w-text" style="color: #00ff88; font-weight: bold;">-- kg</span>
+    </div>
+    <div id="chat-box">Ready for your input...</div>
+    <input type="text" id="userInput" placeholder="Ex: I ate 2 eggs">
+    <button onclick="send()">Update Tracker</button>
+    <div class="card" style="margin-top: 15px;">
+        <div style="font-size: 12px; color: #888; margin-bottom: 5px;">HISTORY</div>
+        <div id="history"></div>
+    </div>
+
+    <script>
+        async function updateUI() {
+            const s = await (await fetch('/stats')).json();
+            document.getElementById('p-text').innerText = `${s.protein} / 150g`;
+            document.getElementById('p-bar').style.width = `${(s.protein/150)*100}%`;
+            document.getElementById('w-text').innerText = `${s.weight} kg`;
+            
+            const h = await (await fetch('/history')).json();
+            document.getElementById('history').innerHTML = h.map(i => `
+                <div class="history-item">
+                    <span>${i.item}</span>
+                    <span style="color:#00ff88">${i.protein}g P</span>
+                </div>`).join('');
+        }
+
+        async function send() {
+            const msg = document.getElementById('userInput').value;
+            if(!msg) return;
+            document.getElementById('chat-box').innerText = "Processing...";
+            const res = await fetch('/track', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ message: msg })
+            });
+            const result = await res.json();
+            if(result.success) {
+                document.getElementById('chat-box').innerText = result.data.recommendation || "Logged successfully!";
+                document.getElementById('userInput').value = "";
+                updateUI();
+            }
+        }
+        updateUI();
+    </script>
+</body>
+</html>
