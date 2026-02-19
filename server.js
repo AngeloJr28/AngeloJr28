@@ -15,12 +15,16 @@ db.serialize(() => {
 app.post('/manual-log', (req, res) => {
     const { type, item, cal, pro, weight } = req.body;
     if (type === 'meal') {
-        db.run(`INSERT INTO fitness_logs (item, calories, protein) VALUES (?, ?, ?)`, [item, cal, pro], (err) => {
+        const finalCal = parseInt(cal) || 0;
+        const finalPro = parseInt(pro) || 0;
+        db.run(`INSERT INTO fitness_logs (item, calories, protein) VALUES (?, ?, ?)`, 
+            [item || 'Meal', finalCal, finalPro], (err) => {
             if (err) return res.status(500).json({ success: false });
             res.json({ success: true });
         });
     } else if (type === 'weight') {
-        db.run(`INSERT INTO weight_logs (weight) VALUES (?)`, [weight], (err) => {
+        const finalWeight = parseFloat(weight) || 0;
+        db.run(`INSERT INTO weight_logs (weight) VALUES (?)`, [finalWeight], (err) => {
             if (err) return res.status(500).json({ success: false });
             res.json({ success: true });
         });
@@ -35,7 +39,6 @@ app.get('/stats', (req, res) => {
     });
 });
 
-// ROUTE: Fetch today's intake history
 app.get('/daily-history', (req, res) => {
     db.all(`SELECT item, calories, protein, time(date) as t FROM fitness_logs WHERE date(date) = date('now') ORDER BY date DESC`, (err, rows) => {
         res.json(rows || []);
@@ -49,4 +52,4 @@ app.get('/weight-history', (req, res) => {
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Manual Elite Server Live`));
+app.listen(PORT, () => console.log(`Manual Server Online`));
