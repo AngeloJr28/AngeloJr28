@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>JELO ELITE AI</title>
+    <title>JELO ELITE MANUAL</title>
     <style>
         :root { --neon: #00f2ff; --pink: #ff007a; --bg: #050505; }
         body { font-family: -apple-system, sans-serif; background: var(--bg); color: white; padding: 20px; margin: 0; }
         .glass { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 20px; margin-bottom: 15px; }
         .bar { height: 12px; background: #1a1a1a; border-radius: 6px; overflow: hidden; margin: 8px 0; }
-        .fill { height: 100%; width: 0%; transition: 1.2s; background: var(--neon); }
+        .fill { height: 100%; width: 0%; transition: 1.2s; }
         h2 { font-size: 11px; color: var(--neon); letter-spacing: 2px; margin: 0 0 10px 0; text-transform: uppercase; }
-        input { width: 100%; padding: 18px; border-radius: 15px; border: 1px solid #333; background: #111; color: white; font-size: 16px; box-sizing: border-box; }
-        button { width: 100%; padding: 18px; background: linear-gradient(90deg, var(--neon), #7000ff); border: none; border-radius: 15px; color: white; font-weight: 900; margin-top: 10px; }
+        input { width: 100%; padding: 16px; border-radius: 12px; border: 1px solid #333; background: #111; color: white; font-size: 16px; box-sizing: border-box; margin-bottom: 10px; }
+        button { width: 100%; padding: 18px; background: linear-gradient(90deg, var(--neon), #7000ff); border: none; border-radius: 12px; color: white; font-weight: 900; margin-top: 5px; cursor: pointer; }
         .workout-box { border-left: 3px solid var(--pink); padding-left: 15px; font-size: 14px; color: #ccc; line-height: 1.5; font-style: italic; }
-        .countdown { color: var(--pink); font-weight: bold; font-size: 14px; text-align: center; margin-bottom: 10px; }
+        .countdown { color: var(--pink); font-weight: bold; font-size: 14px; text-align: center; margin-bottom: 15px; text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -27,13 +27,16 @@
     <div class="glass">
         <h2>GOAL: 80.0 KG (TARGET)</h2>
         <div id="w-text" style="font-size: 28px; font-weight: 900; color: var(--pink);">-- KG</div>
-        <div class="bar"><div id="w-fill" class="fill" style="background: var(--pink);"></div></div>
+        <div class="bar"><div id="w-fill" class="fill" style="background: var(--pink); box-shadow: 0 0 10px var(--pink);"></div></div>
     </div>
 
     <div class="glass">
         <h2>DAILY MACROS</h2>
         <div style="font-size: 12px; color:#888;">Protein: <span id="p-val">0</span>g / <span id="p-target">--</span></div>
-        <div class="bar"><div id="p-fill" class="fill"></div></div>
+        <div class="bar"><div id="p-fill" class="fill" style="background: var(--neon); box-shadow: 0 0 10px var(--neon);"></div></div>
+        
+        <div style="font-size: 12px; color:#888; margin-top:10px;">Calories: <span id="c-val">0</span> / <span id="c-target">--</span></div>
+        <div class="bar"><div id="c-fill" class="fill" style="background: #fff; box-shadow: 0 0 10px #fff;"></div></div>
     </div>
 
     <div class="glass">
@@ -42,10 +45,17 @@
     </div>
 
     <div class="glass">
-        <h2>UPDATE CORE DATA</h2>
-        <input type="text" id="userInput" placeholder="Ex: 150g pork or weight is 88kg">
-        <button onclick="send()">ANALYZE & LOG</button>
-        <div id="status" style="font-size: 11px; text-align: center; margin-top: 10px; color: #555;"></div>
+        <h2>LOG MEAL</h2>
+        <input type="text" id="food" placeholder="Food Name">
+        <input type="number" id="cal" placeholder="Total Calories">
+        <input type="number" id="pro" placeholder="Total Protein (g)">
+        <button onclick="save('meal')">ADD TO MACROS</button>
+        
+        <div style="margin: 25px 0; border-top: 1px solid #222;"></div>
+        
+        <h2>UPDATE WEIGHT</h2>
+        <input type="number" id="weight" placeholder="Current mass in KG">
+        <button onclick="save('weight')" style="background: #222;">LOG WEIGHT</button>
     </div>
 
     <div class="glass">
@@ -54,33 +64,34 @@
     </div>
 
     <script>
-        const workouts = ["SUN: Rest Day", "MON: Chest/Triceps (Machines)", "TUE: Back/Biceps (Machines)", "WED: Legs (Machines)", "THU: Shoulders (Machines)", "FRI: Full Body Circuit", "SAT: Rest Day"];
-        let currentWeight = 0;
-
-        // Set your start date here (YYYY-MM-DD)
+        const workouts = ["SUN: Rest Day - Active Stretching", "MON: Chest/Triceps - Machines (4x12)", "TUE: Back/Biceps - Machines (4x12)", "WED: Legs - Machines (4x12)", "THU: Shoulders - Machines (4x12)", "FRI: Full Body Circuit (Machines)", "SAT: Rest Day - Recovery"];
         const START_DATE = new Date("2026-02-20");
 
         async function updateUI() {
             const res = await fetch('/stats');
             const s = await res.json();
-            currentWeight = s.weight || 0;
+            const weight = s.weight || 0;
 
-            // Countdown Logic
-            const today = new Date();
-            const diffTime = Math.abs(today - START_DATE);
-            const daysPassed = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            // Countdown
+            const daysPassed = Math.ceil(Math.abs(new Date() - START_DATE) / (1000 * 60 * 60 * 24));
             document.getElementById('timer').innerText = `MISSION PROGRESS: ${60 - daysPassed} DAYS REMAINING`;
 
-            // Goal Progress
-            document.getElementById('w-text').innerText = `${currentWeight} KG`;
-            const wDiff = Math.abs(currentWeight - 80);
+            // Weight to 80kg
+            document.getElementById('w-text').innerText = `${weight} KG`;
+            const wDiff = Math.abs(weight - 80);
             document.getElementById('w-fill').style.width = `${Math.max(100 - wDiff, 0)}%`;
 
-            // Protein (Weight x 2)
-            const pTarget = Math.round(currentWeight * 2) || 150;
+            // Targets based on weight
+            const pTarget = Math.round(weight * 2) || 150;
+            const cTarget = Math.round(weight * 33) || 2500;
+
             document.getElementById('p-val').innerText = s.protein;
             document.getElementById('p-target').innerText = pTarget;
             document.getElementById('p-fill').style.width = `${(s.protein/pTarget)*100}%`;
+
+            document.getElementById('c-val').innerText = s.calories;
+            document.getElementById('c-target').innerText = cTarget;
+            document.getElementById('c-fill').style.width = `${(s.calories/cTarget)*100}%`;
 
             document.getElementById('workout-desc').innerText = workouts[new Date().getDay()];
 
@@ -93,19 +104,21 @@
                 </div>`).join('');
         }
 
-        async function send() {
-            const input = document.getElementById('userInput');
-            const btn = document.querySelector('button');
-            if(!input.value) return;
-
-            btn.innerText = "LINKING...";
-            await fetch('/track', {
+        async function save(type) {
+            const data = { type };
+            if(type === 'meal') {
+                data.item = document.getElementById('food').value;
+                data.cal = parseInt(document.getElementById('cal').value);
+                data.pro = parseInt(document.getElementById('pro').value);
+            } else {
+                data.weight = parseFloat(document.getElementById('weight').value);
+            }
+            
+            await fetch('/manual-log', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ message: input.value, currentWeight })
+                body: JSON.stringify(data)
             });
-            input.value = "";
-            btn.innerText = "ANALYZE & LOG";
             updateUI();
         }
         updateUI();
