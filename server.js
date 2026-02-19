@@ -20,11 +20,11 @@ db.serialize(() => {
 app.post('/track', async (req, res) => {
     try {
         const { message } = req.body;
-        // FIX: Using the correct model identification string
+        // Updated model string for better compatibility
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-        const prompt = `User: "${message}". Identify intent: MEAL, WEIGHT, or WORKOUT. 
-        Return ONLY valid JSON:
+        const prompt = `User input: "${message}". Identify intent: MEAL, WEIGHT, or WORKOUT. 
+        Return ONLY a clean JSON object:
         {"type": "meal", "item": "name", "calories": 0, "protein": 0, "carbs": 0, "fat": 0} 
         OR {"type": "weight", "value": 0} 
         OR {"type": "workout", "name": "name", "recommendation": "string"}`;
@@ -43,8 +43,8 @@ app.post('/track', async (req, res) => {
         }
         res.json({ success: true, data });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ success: false, error: "AI Engine Offline" });
+        console.error("System Error:", error.message);
+        res.status(500).json({ success: false, error: "Neural Link Failure: " + error.message });
     }
 });
 
@@ -59,8 +59,8 @@ app.get('/stats', (req, res) => {
 });
 
 app.get('/history', (req, res) => {
-    db.all(`SELECT item as t, protein || 'g P' as s, date FROM fitness_logs UNION SELECT 'Workout: ' || type, 'Finished', date FROM workout_logs ORDER BY date DESC LIMIT 10`, (err, r) => res.json(r || []));
+    db.all(`SELECT item as t, protein || 'g P' as s, date FROM fitness_logs UNION SELECT 'Workout: ' || type, 'COMPLETE', date FROM workout_logs ORDER BY date DESC LIMIT 10`, (err, r) => res.json(r || []));
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Elite Server Active`));
+app.listen(PORT, () => console.log(`Elite Server Online`));

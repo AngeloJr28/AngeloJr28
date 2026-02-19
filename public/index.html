@@ -5,100 +5,99 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>JELO ELITE AI</title>
     <style>
-        :root { --neon: #00f2ff; --p-color: #ff007a; --c-color: #f7ff00; --f-color: #00ff88; --bg: #050505; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: #fff; padding: 20px; margin: 0; overflow-x: hidden; }
+        :root { --neon: #00f2ff; --p-glow: #ff007a; --c-glow: #f7ff00; --f-glow: #00ff88; --bg: #08080a; }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); color: #fff; padding: 20px; margin: 0; }
         
-        /* Glassmorphism Cards */
-        .glass { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); border-radius: 24px; padding: 20px; margin-bottom: 15px; box-shadow: 0 8px 32px 0 rgba(0,0,0,0.8); }
+        .glass { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(20px); border-radius: 25px; padding: 22px; margin-bottom: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
         
-        .header { text-align: center; margin-bottom: 25px; }
-        .header h1 { font-size: 28px; letter-spacing: 4px; font-weight: 900; margin: 0; color: #fff; text-shadow: 0 0 10px var(--neon); }
-        
-        /* Nutrient Bar Design */
-        .macro-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .bar-bg { flex-grow: 1; height: 8px; background: #222; border-radius: 4px; margin-left: 15px; overflow: hidden; position: relative; }
-        .bar-fill { height: 100%; width: 0%; transition: width 1.2s cubic-bezier(0.1, 0.7, 1.0, 0.1); box-shadow: 0 0 10px inherit; }
-        
-        .label { font-size: 11px; font-weight: bold; width: 60px; color: #888; text-transform: uppercase; }
-        .val { font-size: 13px; font-weight: 800; width: 45px; text-align: right; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { font-size: 26px; letter-spacing: 5px; font-weight: 900; margin: 0; text-shadow: 0 0 15px var(--neon); }
+        .header div { font-size: 10px; color: #444; margin-top: 8px; font-weight: bold; }
 
-        input { width: 100%; padding: 20px; border-radius: 18px; border: 2px solid #222; background: #111; color: white; font-size: 16px; box-sizing: border-box; transition: 0.3s; }
-        input:focus { border-color: var(--neon); box-shadow: 0 0 15px rgba(0, 242, 255, 0.2); outline: none; }
-        
-        button { width: 100%; padding: 20px; background: linear-gradient(135deg, var(--neon), #7000ff); border: none; border-radius: 18px; color: white; font-weight: 900; font-size: 16px; letter-spacing: 2px; margin-top: 15px; cursor: pointer; box-shadow: 0 5px 20px rgba(0, 242, 255, 0.3); }
-        button:active { transform: scale(0.97); }
+        .macro-label { font-size: 10px; font-weight: 900; text-transform: uppercase; color: #666; width: 60px; }
+        .macro-row { display: flex; align-items: center; margin-bottom: 15px; }
+        .bar-container { flex-grow: 1; height: 10px; background: #1a1a1c; border-radius: 5px; margin: 0 15px; overflow: hidden; position: relative; }
+        .bar-fill { height: 100%; width: 0%; transition: width 1.5s cubic-bezier(0.2, 0.8, 0.2, 1); border-radius: 5px; }
+        .macro-val { font-size: 14px; font-weight: 800; width: 45px; text-align: right; }
 
-        .history-card { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #1a1a1a; font-size: 13px; }
+        input { width: 100%; padding: 20px; border-radius: 18px; border: 1px solid #222; background: #121214; color: white; font-size: 16px; box-sizing: border-box; transition: 0.3s; }
+        input:focus { border-color: var(--neon); box-shadow: 0 0 20px rgba(0, 242, 255, 0.2); outline: none; }
+        
+        button { width: 100%; padding: 20px; background: linear-gradient(135deg, var(--neon), #8000ff); border: none; border-radius: 18px; color: white; font-weight: 900; font-size: 16px; margin-top: 15px; cursor: pointer; box-shadow: 0 8px 25px rgba(0, 242, 255, 0.2); transition: 0.3s; }
+        button:active { transform: scale(0.96); opacity: 0.9; }
+
+        .history-card { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #1a1a1c; font-size: 13px; }
     </style>
 </head>
 <body>
     <div class="header">
         <h1>JELO<span style="color:var(--neon)">ELITE</span></h1>
-        <div id="weight" style="font-size: 10px; color: #555; margin-top: 5px;">CORE MASS: -- KG</div>
+        <div id="weight">CORE MASS: -- KG</div>
     </div>
 
     <div class="glass">
-        <div style="font-size: 12px; color: var(--neon); margin-bottom: 15px; font-weight: bold; letter-spacing: 1px;">DAILY NUTRIENTS</div>
+        <div style="font-size: 11px; color: var(--neon); font-weight: bold; margin-bottom: 20px; letter-spacing: 2px;">VITAL NUTRIENTS</div>
         
         <div class="macro-row">
-            <div class="label">Protein</div>
-            <div class="bar-bg"><div id="p-bar" class="bar-fill" style="background:var(--p-color); box-shadow: 0 0 10px var(--p-color);"></div></div>
-            <div class="val" id="p-val">0g</div>
+            <div class="macro-label">Protein</div>
+            <div class="bar-container"><div id="p-bar" class="bar-fill" style="background:var(--p-glow); box-shadow: 0 0 15px var(--p-glow);"></div></div>
+            <div class="macro-val" id="p-val">0g</div>
         </div>
 
         <div class="macro-row">
-            <div class="label">Carbs</div>
-            <div class="bar-bg"><div id="c-bar" class="bar-fill" style="background:var(--c-color); box-shadow: 0 0 10px var(--c-color);"></div></div>
-            <div class="val" id="c-val">0g</div>
+            <div class="macro-label">Carbs</div>
+            <div class="bar-container"><div id="c-bar" class="bar-fill" style="background:var(--c-glow); box-shadow: 0 0 15px var(--c-glow);"></div></div>
+            <div class="macro-val" id="c-val">0g</div>
         </div>
 
         <div class="macro-row">
-            <div class="label">Fats</div>
-            <div class="bar-bg"><div id="f-bar" class="bar-fill" style="background:var(--f-color); box-shadow: 0 0 10px var(--f-color);"></div></div>
-            <div class="val" id="f-val">0g</div>
+            <div class="macro-label">Fats</div>
+            <div class="bar-container"><div id="f-bar" class="bar-fill" style="background:var(--f-glow); box-shadow: 0 0 15px var(--f-glow);"></div></div>
+            <div class="macro-val" id="f-val">0g</div>
         </div>
     </div>
 
     <div class="glass" style="display:flex; justify-content: space-between; align-items: center;">
-        <span style="font-size: 12px; font-weight: bold; color: var(--p-color);">WEEKLY WORKOUTS</span>
-        <span id="wk-val" style="font-size: 20px; font-weight: 900;">0 / 4</span>
+        <span style="font-size: 11px; font-weight: bold; color: var(--p-glow); letter-spacing: 1px;">WEEKLY ACTIVITY</span>
+        <span id="wk-val" style="font-size: 22px; font-weight: 900;">0 / 4</span>
     </div>
 
-    <div class="glass" id="chat-box" style="font-size: 14px; text-align: center; color: #666; font-style: italic; min-height: 40px;">System Ready. Input Data...</div>
+    <div class="glass" id="chat-box" style="font-size: 13px; text-align: center; color: #555; font-style: italic; min-height: 40px;">System Online. Awaiting biometric data...</div>
 
-    <input type="text" id="userInput" placeholder="Ate 200g chicken breast">
+    <input type="text" id="userInput" placeholder="Ex: Ate 200g chicken and rice">
     <button onclick="send()">UPDATE ECOSYSTEM</button>
 
-    <div class="glass" style="margin-top: 25px;">
-        <div style="font-size: 11px; color: #555; margin-bottom: 10px;">RECENT ACTIVITY</div>
+    <div class="glass" style="margin-top: 30px; border-bottom: none;">
+        <div style="font-size: 10px; color: #444; margin-bottom: 10px; font-weight: bold;">RECENT INTELLIGENCE</div>
         <div id="history"></div>
     </div>
 
     <script>
         async function updateUI() {
-            const res = await fetch('/stats');
-            const s = await res.json();
-            
-            // Goals: Protein 150g, Carbs 200g, Fats 60g
-            document.getElementById('p-val').innerText = s.p + 'g';
-            document.getElementById('p-bar').style.width = Math.min((s.p/150)*100, 100) + '%';
-            
-            document.getElementById('c-val').innerText = s.c + 'g';
-            document.getElementById('c-bar').style.width = Math.min((s.c/200)*100, 100) + '%';
-            
-            document.getElementById('f-val').innerText = s.f + 'g';
-            document.getElementById('f-bar').style.width = Math.min((s.f/60)*100, 100) + '%';
+            try {
+                const res = await fetch('/stats');
+                const s = await res.json();
+                
+                document.getElementById('p-val').innerText = s.p + 'g';
+                document.getElementById('p-bar').style.width = Math.min((s.p/150)*100, 100) + '%';
+                
+                document.getElementById('c-val').innerText = s.c + 'g';
+                document.getElementById('c-bar').style.width = Math.min((s.c/200)*100, 100) + '%';
+                
+                document.getElementById('f-val').innerText = s.f + 'g';
+                document.getElementById('f-bar').style.width = Math.min((s.f/60)*100, 100) + '%';
 
-            document.getElementById('weight').innerText = `CORE MASS: ${s.weight} KG`;
-            document.getElementById('wk-val').innerText = `${s.workouts} / 4`;
+                document.getElementById('weight').innerText = `CORE MASS: ${s.weight} KG`;
+                document.getElementById('wk-val').innerText = `${s.workouts} / 4`;
 
-            const hRes = await fetch('/history');
-            const h = await hRes.json();
-            document.getElementById('history').innerHTML = h.map(i => `
-                <div class="history-card">
-                    <span style="font-weight:bold">${i.t}</span>
-                    <span style="color:var(--neon)">${i.s}</span>
-                </div>`).join('');
+                const hRes = await fetch('/history');
+                const h = await hRes.json();
+                document.getElementById('history').innerHTML = h.map(i => `
+                    <div class="history-card">
+                        <span style="font-weight:bold">${i.t}</span>
+                        <span style="color:var(--neon)">${i.s}</span>
+                    </div>`).join('');
+            } catch (e) { console.error("Update Sync Failed"); }
         }
 
         async function send() {
@@ -106,20 +105,24 @@
             const btn = document.querySelector('button');
             if(!input.value) return;
 
-            btn.innerText = "PROCESSING...";
-            const res = await fetch('/track', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ message: input.value })
-            });
-            const result = await res.json();
-            
-            if(result.success) {
-                document.getElementById('chat-box').innerText = result.data.recommendation || "System Update Confirmed.";
-                input.value = "";
-                updateUI();
-            } else {
-                document.getElementById('chat-box').innerText = "ERROR: " + result.error;
+            btn.innerText = "ANALYZING...";
+            try {
+                const res = await fetch('/track', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ message: input.value })
+                });
+                const result = await res.json();
+                
+                if(result.success) {
+                    document.getElementById('chat-box').innerText = result.data.recommendation || "System Updated Successfully.";
+                    input.value = "";
+                    updateUI();
+                } else {
+                    document.getElementById('chat-box').innerText = "ERROR: " + result.error;
+                }
+            } catch (err) {
+                document.getElementById('chat-box').innerText = "CONNECTION FAILURE";
             }
             btn.innerText = "UPDATE ECOSYSTEM";
         }
